@@ -3,6 +3,8 @@ package com.ihaveu.iuzuan.filedownload.file;
 import android.content.Context;
 import android.os.Environment;
 
+import com.ihaveu.iuzuan.filedownload.utils.Md5Utils;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -36,7 +38,7 @@ public class FileStorageManager {
         } else {
             parent = mContext.getCacheDir();
         }
-        String fileNam = url;
+        String fileNam = Md5Utils.generataCode(url);
         File file = new File(parent, fileNam);
         if (!file.exists()) {
             try {
