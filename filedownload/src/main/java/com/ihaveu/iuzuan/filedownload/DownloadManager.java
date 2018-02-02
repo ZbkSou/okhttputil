@@ -4,9 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.ihaveu.iuzuan.filedownload.http.DownloadCallback;
 import com.ihaveu.iuzuan.filedownload.http.HttpManager;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +13,11 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * User: bkzhou
@@ -53,12 +56,12 @@ public class DownloadManager {
         HttpManager.getInstance().asyncRequest(url, new Callback() {
 
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call call, IOException e) {
 
             }
 
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful() && callback != null) {
                     callback.fail(HttpManager.NETWORK_ERROR_CODE, "网络问题");
                     return;
@@ -70,6 +73,8 @@ public class DownloadManager {
                 }
                 processDownload(url,length,callback);
             }
+
+
         });
     }
 
