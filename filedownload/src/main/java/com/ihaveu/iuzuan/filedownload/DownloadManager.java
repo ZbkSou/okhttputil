@@ -8,6 +8,9 @@ import com.ihaveu.iuzuan.filedownload.http.HttpManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -27,9 +30,12 @@ import okhttp3.Response;
 public class DownloadManager {
 
     private final static int MAX_THREAD = 2;
+
+
+    private HashSet<DownloadTask> mHashSet = new HashSet<>();
     //线程池
     private static final ThreadPoolExecutor sThreadPool = new ThreadPoolExecutor(MAX_THREAD, MAX_THREAD, 60, TimeUnit.MILLISECONDS,
-        new SynchronousQueue<Runnable>(), new ThreadFactory() {
+        new LinkedBlockingDeque<Runnable>(), new ThreadFactory() {
         private AtomicInteger mIntegert = new AtomicInteger();
 
         @Override
@@ -53,6 +59,13 @@ public class DownloadManager {
 
 
     public void download(final String url, final DownloadCallback callback) {
+
+        DownloadTask task = new DownloadTask(url,callback);
+        if(mHashSet.contains(task)){
+            callback.fail();
+
+        }
+
         HttpManager.getInstance().asyncRequest(url, new Callback() {
 
             @Override

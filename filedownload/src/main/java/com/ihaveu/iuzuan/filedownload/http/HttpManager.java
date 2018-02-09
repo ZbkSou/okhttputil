@@ -25,9 +25,10 @@ import okhttp3.Response;
  * Description:
  */
 public class HttpManager {
-    public static final int NETWORK_CODE = 1;
-    public static final int NETWORK_ERROR_CODE = 2;
+
+    public static final int NETWORK_ERROR_CODE = 1;
     public static final int CONTENT_LENGTH_ERROR_CODE = 2;
+    public static final int TASK_RUNNING_ERROR_CODE = 3;
     private Context mContext;
 
 
@@ -81,7 +82,7 @@ public class HttpManager {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful() && callback != null) {
-                    callback.fail(NETWORK_CODE, "请求失败");
+                    callback.fail(NETWORK_ERROR_CODE, "请求失败");
                 }
                 File file = FileStorageManager.getInstance().getFileByName(url);
                 byte[] buffer = new byte[1024 * 500];
@@ -97,7 +98,12 @@ public class HttpManager {
         });
     }
 
-
+    /**
+     * 异步请求
+     *
+     * @param url
+     * @param callback
+     */
     public void asyncRequest(final String url, Callback callback) {
         Request request = new Request.Builder().url(url).build();
         mClient.newCall(request).enqueue(callback);

@@ -34,6 +34,7 @@ public class FileStorageManager {
         File parent;
         //判断内置 sd 卡
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            //外置文件缓存目录
             parent = mContext.getExternalCacheDir();
         } else {
             parent = mContext.getCacheDir();
