@@ -5,7 +5,7 @@ import com.ihaveu.iuzuan.filedownload.http.DownloadCallback;
 /**
  * User: bkzhou
  * Date: 2018/2/8
- * Description:
+ * Description:添加任务机制防止任务的重复提交
  */
 public class DownloadTask {
     private String mUrl;

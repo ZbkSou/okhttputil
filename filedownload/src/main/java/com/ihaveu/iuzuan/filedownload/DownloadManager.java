@@ -58,19 +58,29 @@ public class DownloadManager {
     }
 
 
+    /**
+     * 处理任务结束
+     * @param task
+     */
+    private void finish(DownloadTask task){
+
+        mHashSet.remove(task);
+    }
     public void download(final String url, final DownloadCallback callback) {
 
-        DownloadTask task = new DownloadTask(url,callback);
+        final DownloadTask task = new DownloadTask(url,callback);
         if(mHashSet.contains(task)){
-            callback.fail();
-
+            callback.fail(HttpManager.TASK_RUNNING_ERROR_CODE,"任务已经执行了");
+            return;
         }
+        //将任务添加到 set
+        mHashSet.add(task);
 
         HttpManager.getInstance().asyncRequest(url, new Callback() {
 
             @Override
             public void onFailure(Call call, IOException e) {
-
+                finish(task);
             }
 
             @Override
@@ -85,6 +95,7 @@ public class DownloadManager {
                     return;
                 }
                 processDownload(url,length,callback);
+                finish(task);
             }
 
 
@@ -95,7 +106,12 @@ public class DownloadManager {
         long threadDownloadSize = length /MAX_THREAD;
         for (int i = 0; i < MAX_THREAD; i++) {
             long startSize = i*threadDownloadSize;
-            long endSize = (i+1)*threadDownloadSize-1;
+            long endSize = 0;
+            if(endSize==MAX_THREAD-1){
+                endSize =length-1;
+            }else {
+                endSize = (i+1)*threadDownloadSize-1;
+            }
             sThreadPool.execute(new DownloadRunnable(startSize,endSize,url,callback));
         }
     }
