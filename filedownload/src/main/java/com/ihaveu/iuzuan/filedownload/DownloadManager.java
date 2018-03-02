@@ -2,14 +2,19 @@ package com.ihaveu.iuzuan.filedownload;
 
 import android.support.annotation.NonNull;
 
+import com.ihaveu.iuzuan.filedownload.db.DownloadEntity;
+import com.ihaveu.iuzuan.filedownload.db.DownloadHelper;
 import com.ihaveu.iuzuan.filedownload.http.DownloadCallback;
 import com.ihaveu.iuzuan.filedownload.http.HttpManager;
 
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
@@ -33,6 +38,9 @@ public class DownloadManager {
 
 
     private HashSet<DownloadTask> mHashSet = new HashSet<>();
+
+    private List<DownloadEntity> mCache;
+
     //线程池
     private static final ThreadPoolExecutor sThreadPool = new ThreadPoolExecutor(MAX_THREAD, MAX_THREAD, 60, TimeUnit.MILLISECONDS,
         new LinkedBlockingDeque<Runnable>(), new ThreadFactory() {
@@ -60,59 +68,79 @@ public class DownloadManager {
 
     /**
      * 处理任务结束
+     *
      * @param task
      */
-    private void finish(DownloadTask task){
+    private void finish(DownloadTask task) {
 
         mHashSet.remove(task);
     }
+
     public void download(final String url, final DownloadCallback callback) {
 
-        final DownloadTask task = new DownloadTask(url,callback);
-        if(mHashSet.contains(task)){
-            callback.fail(HttpManager.TASK_RUNNING_ERROR_CODE,"任务已经执行了");
+        final DownloadTask task = new DownloadTask(url, callback);
+        if (mHashSet.contains(task)) {
+            callback.fail(HttpManager.TASK_RUNNING_ERROR_CODE, "任务已经执行了");
             return;
         }
         //将任务添加到 set
         mHashSet.add(task);
+        mCache = DownloadHelper.getInstance().getAll(url);
+        if (mCache == null || mCache.size() == 0) {
+            //数据库中没有下载记录
+            HttpManager.getInstance().asyncRequest(url, new Callback() {
 
-        HttpManager.getInstance().asyncRequest(url, new Callback() {
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-                finish(task);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful() && callback != null) {
-                    callback.fail(HttpManager.NETWORK_ERROR_CODE, "网络问题");
-                    return;
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    finish(task);
                 }
-                long length = response.body().contentLength();
-                if (length == -1) {
-                    callback.fail(HttpManager.CONTENT_LENGTH_ERROR_CODE, "contentLength -1");
-                    return;
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (!response.isSuccessful() && callback != null) {
+                        callback.fail(HttpManager.NETWORK_ERROR_CODE, "网络问题");
+                        return;
+                    }
+                    long length = response.body().contentLength();
+                    if (length == -1) {
+                        callback.fail(HttpManager.CONTENT_LENGTH_ERROR_CODE, "contentLength -1");
+                        return;
+                    }
+                    processDownload(url, length, callback,mCache);
+                    finish(task);
                 }
-                processDownload(url,length,callback);
-                finish(task);
-            }
+            });
 
-
-        });
+        }else {
+            //// TODO: 2018/3/2  处理下载过的数据
+            
+            
+        }
     }
 
-    private void processDownload(String url, long length, DownloadCallback callback) {
-        long threadDownloadSize = length /MAX_THREAD;
+    private void processDownload(String url, long length, DownloadCallback callback,List<DownloadEntity> cache) {
+        long threadDownloadSize = length / MAX_THREAD;
+
+        if (cache == null && cache.size() == 0) {
+            mCache = new ArrayList<>();
+        }
         for (int i = 0; i < MAX_THREAD; i++) {
-            long startSize = i*threadDownloadSize;
+            DownloadEntity entity = new DownloadEntity();
+            //计算每个进程下载的长度
+            long startSize = i * threadDownloadSize;
             long endSize = 0;
-            if(endSize==MAX_THREAD-1){
-                endSize =length-1;
-            }else {
-                endSize = (i+1)*threadDownloadSize-1;
+            if (endSize == MAX_THREAD - 1) {
+                endSize = length - 1;
+            } else {
+                endSize = (i + 1) * threadDownloadSize - 1;
             }
-            sThreadPool.execute(new DownloadRunnable(startSize,endSize,url,callback));
+
+            //需要保存的下载信息
+            entity.setDownload_url(url);
+            entity.setStart_position(startSize);
+            entity.setEnd_position(endSize);
+            entity.setThread_id(i + 1);
+            sThreadPool.execute(new DownloadRunnable(startSize, endSize, url, callback, entity));
         }
     }
 }

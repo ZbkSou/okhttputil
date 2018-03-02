@@ -1,7 +1,9 @@
 package com.ihaveu.iuzuan.okhttp;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -18,6 +20,7 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
+    private int count;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,16 +58,22 @@ public class MainActivity extends AppCompatActivity {
 
 
         Logger.debug("MainActivity",new Date().getTime()+"");
-        DownloadManager.getInstance().download("https://upload-images.jianshu.io/upload_images/2206395-f7cfebb6275a53a4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/527", new DownloadCallback() {
+        final String url = "https://raw.githubusercontent.com/getlantern/lantern-binaries/master/lantern-installer.apk";
+        DownloadManager.getInstance().download(url, new DownloadCallback() {
             @Override
             public void success(File file) {
-                final Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            imageView.setImageBitmap(bitmap);
-                        }
-                    });
+                if(count<1){
+                    count++;
+                    return;
+                }
+                installApk(file);
+//                final Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+////                            imageView.setImageBitmap(bitmap);
+//                        }
+//                    });
                 Logger.debug("MainActivity",new Date().getTime()+"");
                 Logger.debug("MainActivity","success"+file.getAbsolutePath());
             }
@@ -79,6 +88,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+    }
+    private void installApk(File file){
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setDataAndType(Uri.parse("file://"+file.getAbsoluteFile().toString()),"application/vnd.android.package-archive");
+
+        MainActivity.this.startActivity(intent);
 
     }
 }

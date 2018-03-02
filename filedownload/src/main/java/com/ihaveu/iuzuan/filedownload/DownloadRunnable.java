@@ -1,9 +1,13 @@
 package com.ihaveu.iuzuan.filedownload;
 
+import com.ihaveu.iuzuan.filedownload.db.DownloadEntity;
+import com.ihaveu.iuzuan.filedownload.db.DownloadHelper;
 import com.ihaveu.iuzuan.filedownload.file.FileStorageManager;
 import com.ihaveu.iuzuan.filedownload.http.DownloadCallback;
 import com.ihaveu.iuzuan.filedownload.http.HttpManager;
 
+
+import org.greenrobot.greendao.annotation.Entity;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,11 +30,13 @@ public class DownloadRunnable implements Runnable{
     private String mUrl ;
     private DownloadCallback mCallback;
 
-    public DownloadRunnable(long mStart, long mEnd, String mUrl, DownloadCallback mCallback) {
+    private DownloadEntity mEntity;
+    public DownloadRunnable(long mStart, long mEnd, String mUrl, DownloadCallback mCallback, DownloadEntity entity) {
         this.mStart = mStart;
         this.mEnd = mEnd;
         this.mUrl = mUrl;
         this.mCallback = mCallback;
+        this.mEntity = entity;
     }
 
     @Override
@@ -41,6 +47,7 @@ public class DownloadRunnable implements Runnable{
             return;
         }
         File file  = FileStorageManager.getInstance().getFileByName(mUrl);
+        long progress = 0;
         try {
             RandomAccessFile randomAccessFile = new RandomAccessFile(file,"rwd");
             randomAccessFile.seek(mStart);
@@ -49,12 +56,19 @@ public class DownloadRunnable implements Runnable{
             InputStream inSteam = response.body().byteStream();
             while ((len = inSteam.read(buffer,0,buffer.length))!=-1){
                 randomAccessFile.write(buffer,0,len);
+
+                progress += len;
+                mEntity.setProgress_position(progress);
             }
+            randomAccessFile.close();
             mCallback.success(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            //插入下载文件状态
+            DownloadHelper.getInstance().insert(mEntity);
         }
 
     }
