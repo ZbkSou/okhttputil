@@ -1,10 +1,13 @@
 package com.ihaveu.iuzuan.filedownload;
 
+import android.os.Process;
+
 import com.ihaveu.iuzuan.filedownload.db.DownloadEntity;
 import com.ihaveu.iuzuan.filedownload.db.DownloadHelper;
 import com.ihaveu.iuzuan.filedownload.file.FileStorageManager;
 import com.ihaveu.iuzuan.filedownload.http.DownloadCallback;
 import com.ihaveu.iuzuan.filedownload.http.HttpManager;
+import com.ihaveu.iuzuan.filedownload.utils.Logger;
 
 
 import org.greenrobot.greendao.annotation.Entity;
@@ -56,9 +59,10 @@ public class DownloadRunnable implements Runnable{
             InputStream inSteam = response.body().byteStream();
             while ((len = inSteam.read(buffer,0,buffer.length))!=-1){
                 randomAccessFile.write(buffer,0,len);
-
+                //每写入一部分就增加保存进度
                 progress += len;
                 mEntity.setProgress_position(progress);
+                Logger.debug("nate","progress ---> " +progress+" thread-->"+ Thread.currentThread());
             }
             randomAccessFile.close();
             mCallback.success(file);

@@ -113,8 +113,12 @@ public class DownloadManager {
 
         }else {
             //// TODO: 2018/3/2  处理下载过的数据
-            
-            
+            for (DownloadEntity entity:mCache) {
+                //startSize为开始数据加上已完成的进度
+                long startSize = entity.getStart_position()+entity.getProgress_position();
+                long endSize =  entity.getEnd_position();
+                sThreadPool.execute(new DownloadRunnable(startSize, endSize, url, callback, entity));
+            }
         }
     }
 

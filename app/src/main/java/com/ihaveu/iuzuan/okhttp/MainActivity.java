@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 //                    runOnUiThread(new Runnable() {
 //                        @Override
 //                        public void run() {
-////                            imageView.setImageBitmap(bitmap);
+//                            imageView.setImageBitmap(bitmap);
 //                        }
 //                    });
                 Logger.debug("MainActivity",new Date().getTime()+"");
