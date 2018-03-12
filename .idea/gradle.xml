@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/dbgenerate" />
             <option value="$PROJECT_DIR$/filedownload" />
+            <option value="$PROJECT_DIR$/httpframework" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -4,8 +4,10 @@ import android.support.annotation.NonNull;
 
 import com.ihaveu.iuzuan.filedownload.db.DownloadEntity;
 import com.ihaveu.iuzuan.filedownload.db.DownloadHelper;
+import com.ihaveu.iuzuan.filedownload.file.FileStorageManager;
 import com.ihaveu.iuzuan.filedownload.http.DownloadCallback;
 import com.ihaveu.iuzuan.filedownload.http.HttpManager;
+import com.ihaveu.iuzuan.filedownload.utils.Logger;
 
 
 import java.io.File;
@@ -15,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
@@ -41,6 +45,11 @@ public class DownloadManager {
 
     private List<DownloadEntity> mCache;
 
+    //监控文件下载进度 线程池
+    private static final ExecutorService SLOCAL_PROGRESS_POOL = Executors.newFixedThreadPool(1);
+
+    //文件 长度
+    private long mLength = 0;
     //线程池
     private static final ThreadPoolExecutor sThreadPool = new ThreadPoolExecutor(MAX_THREAD, MAX_THREAD, 60, TimeUnit.MILLISECONDS,
         new LinkedBlockingDeque<Runnable>(), new ThreadFactory() {
@@ -101,30 +110,55 @@ public class DownloadManager {
                         callback.fail(HttpManager.NETWORK_ERROR_CODE, "网络问题");
                         return;
                     }
-                    long length = response.body().contentLength();
-                    if (length == -1) {
+                    mLength = response.body().contentLength();
+                    if (mLength == -1) {
                         callback.fail(HttpManager.CONTENT_LENGTH_ERROR_CODE, "contentLength -1");
                         return;
                     }
-                    processDownload(url, length, callback,mCache);
+                    processDownload(url, mLength, callback,mCache);
                     finish(task);
                 }
             });
 
         }else {
             //// TODO: 2018/3/2  处理下载过的数据
-            for (DownloadEntity entity:mCache) {
+            for (int  i =0 ; i<mCache.size();i++ ) {
+                DownloadEntity entity = mCache.get(i);
+                if(i==mCache.size()-1){
+                    mLength = entity.getEnd_position()+1;
+                }
                 //startSize为开始数据加上已完成的进度
                 long startSize = entity.getStart_position()+entity.getProgress_position();
                 long endSize =  entity.getEnd_position();
+                Logger.debug("nate","startSize:"+startSize+"  endSize:"+endSize);
                 sThreadPool.execute(new DownloadRunnable(startSize, endSize, url, callback, entity));
             }
         }
+        SLOCAL_PROGRESS_POOL.execute(new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                    try{
+                        Thread.sleep(500);
+                        File file = FileStorageManager.getInstance().getFileByName(url);
+                        long fileSize = file.length();
+                        int progress = (int)(fileSize*100.0/mLength);
+                        if(progress>=100){
+                            callback.progress(progress);
+                            return;
+                        }
+                        callback.progress(progress);
+                    }catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     private void processDownload(String url, long length, DownloadCallback callback,List<DownloadEntity> cache) {
         long threadDownloadSize = length / MAX_THREAD;
-
+        Logger.debug("nate","length："+length+"threadDownloadSize:"+threadDownloadSize);
         if (cache == null && cache.size() == 0) {
             mCache = new ArrayList<>();
         }
@@ -133,12 +167,12 @@ public class DownloadManager {
             //计算每个进程下载的长度
             long startSize = i * threadDownloadSize;
             long endSize = 0;
-            if (endSize == MAX_THREAD - 1) {
+            if (i  == MAX_THREAD - 1) {
                 endSize = length - 1;
             } else {
                 endSize = (i + 1) * threadDownloadSize - 1;
             }
-
+            Logger.debug("nate","startSize:"+startSize+"  endSize:"+endSize);
             //需要保存的下载信息
             entity.setDownload_url(url);
             entity.setStart_position(startSize);

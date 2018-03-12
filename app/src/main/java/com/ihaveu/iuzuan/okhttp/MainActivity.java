@@ -58,7 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         Logger.debug("MainActivity",new Date().getTime()+"");
-        final String url = "https://raw.githubusercontent.com/getlantern/lantern-binaries/master/lantern-installer.apk";
+        final String url = "http://apk.gfan.com/index.php?c=api&m=down&src=wap&apk=50540";
+//        final String url = "http://i2.ihaveu.net/image/auction/picture/000/113/921/path/6b5f052f.png";
         DownloadManager.getInstance().download(url, new DownloadCallback() {
             @Override
             public void success(File file) {
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void progress(int progress) {
-
+                Logger.debug("MainActivity","progress  :"+progress);
             }
         });
 

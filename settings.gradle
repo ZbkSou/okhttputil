@@ -1,1 +1,1 @@
-include ':app', ':filedownload', ':dbgenerate'
+include ':app', ':filedownload', ':dbgenerate', ':httpframework'

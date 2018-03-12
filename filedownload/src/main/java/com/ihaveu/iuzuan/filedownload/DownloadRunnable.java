@@ -26,14 +26,15 @@ import okhttp3.Response;
  * Date: 2018/1/23
  * Description:处理多线程下载
  */
-public class DownloadRunnable implements Runnable{
+public class DownloadRunnable implements Runnable {
 
-    private long mStart ;
-    private long mEnd ;
-    private String mUrl ;
+    private long mStart;
+    private long mEnd;
+    private String mUrl;
     private DownloadCallback mCallback;
 
     private DownloadEntity mEntity;
+
     public DownloadRunnable(long mStart, long mEnd, String mUrl, DownloadCallback mCallback, DownloadEntity entity) {
         this.mStart = mStart;
         this.mEnd = mEnd;
@@ -44,25 +45,28 @@ public class DownloadRunnable implements Runnable{
 
     @Override
     public void run() {
-       Response response =  HttpManager.getInstance().syncRequestByRange(mUrl,mStart,mEnd);
-        if(response == null && mCallback!= null){
-            mCallback.fail(HttpManager.NETWORK_ERROR_CODE,"网络问题");
+
+        //设置 nice 为10
+        Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+        Response response = HttpManager.getInstance().syncRequestByRange(mUrl, mStart, mEnd);
+        if (response == null && mCallback != null) {
+            mCallback.fail(HttpManager.NETWORK_ERROR_CODE, "网络问题");
             return;
         }
-        File file  = FileStorageManager.getInstance().getFileByName(mUrl);
+        File file = FileStorageManager.getInstance().getFileByName(mUrl);
         long progress = 0;
         try {
-            RandomAccessFile randomAccessFile = new RandomAccessFile(file,"rwd");
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rwd");
             randomAccessFile.seek(mStart);
-            byte[] buffer = new  byte[1024*500];
-            int  len;
+            byte[] buffer = new byte[1024 * 500];
+            int len;
             InputStream inSteam = response.body().byteStream();
-            while ((len = inSteam.read(buffer,0,buffer.length))!=-1){
-                randomAccessFile.write(buffer,0,len);
+            while ((len = inSteam.read(buffer, 0, buffer.length)) != -1) {
+                randomAccessFile.write(buffer, 0, len);
                 //每写入一部分就增加保存进度
                 progress += len;
                 mEntity.setProgress_position(progress);
-                Logger.debug("nate","progress ---> " +progress+" thread-->"+ Thread.currentThread());
+                Logger.debug("nate", "progress ---> " + progress + " thread-->" + Thread.currentThread());
             }
             randomAccessFile.close();
             mCallback.success(file);
