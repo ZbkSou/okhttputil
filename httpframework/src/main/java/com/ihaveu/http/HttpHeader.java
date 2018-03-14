@@ -12,66 +12,94 @@ import java.util.Set;
  * Date: 2018/3/9
  * Description:http 请求头
  */
-public class HttpHeader implements NameValueMap<String,String>{
+public class HttpHeader implements NameValueMap<String, String> {
 
 
-    public final static String ACCEPT="Accept";
-    public final static String PRAGMA="Pragma";
-    public  final static String USER_AGENT = "User_Agent";
-    public  final static String PROXY_CONNECTION = "Proxy_Connection";
+    public final static String ACCEPT = "Accept";
+    public final static String PRAGMA = "Pragma";
+    public final static String USER_AGENT = "User-Agent";
+    public final static String PROXY_CONNECTION = "Proxy-Connection";
     public final static String ACCEPT_ENCODING = "Accept-Encoding";
-    public final static String  CACHE_CONTROL = "Cache-Control";
+    public final static String CACHE_CONTROL = "Cache-Control";
+    public final static String CONTENT_ENCODING = "Content-Encoding";
+    public final static String CONNECTION = "Connection";
+    public final static String CONTENT_LENGTH = "Content-Length";
+    private Map<String, String> mMap = new HashMap<>();
 
-    private Map<String ,String > mMap = new HashMap<>();
-
-    public String getAccept(){
+    public String getAccept() {
         return get(ACCEPT);
     }
-    public void setAccept(String value){
-        set(ACCEPT,value);
+
+    public void setAccept(String value) {
+        set(ACCEPT, value);
     }
 
-    public  String getPragma() {
+    public String getPragma() {
         return get(PRAGMA);
     }
 
-    public void setPragma(String value){
-        set(PRAGMA,value);
+    public void setPragma(String value) {
+        set(PRAGMA, value);
 
     }
-    public  String getProxyConnection() {
+
+    public String getProxyConnection() {
         return get(USER_AGENT);
     }
 
-    public void setProxyConnection(String value){
-        set(USER_AGENT,value);
+    public void setProxyConnection(String value) {
+        set(USER_AGENT, value);
     }
 
 
-    public  String getUserAgent() {
+    public String getUserAgent() {
         return get(PROXY_CONNECTION);
     }
 
-    public void setUserAgent(String value){
-        set(PROXY_CONNECTION,value);
+    public void setUserAgent(String value) {
+        set(PROXY_CONNECTION, value);
     }
 
-    public  String getAcceptEncodeing() {
+    public String getAcceptEncodeing() {
         return get(ACCEPT_ENCODING);
     }
 
-    public void setAcceptEncodeing(String value){
-        set(ACCEPT_ENCODING,value);
+    public void setAcceptEncodeing(String value) {
+        set(ACCEPT_ENCODING, value);
     }
 
-    public  String getCacheControl() {
+    public String getCacheControl() {
         return get(CACHE_CONTROL);
     }
 
-    public void setCacheControl(String value){
-        set(CACHE_CONTROL,value);
+    public void setCacheControl(String value) {
+        set(CACHE_CONTROL, value);
     }
-//////////////////////////////
+
+    public String getContentEncoding() {
+        return get(CONTENT_ENCODING);
+    }
+
+    public void setContentEncoding(String value) {
+        set(CONTENT_ENCODING, value);
+    }
+
+    public String getConnection() {
+        return get(CONNECTION);
+    }
+
+    public void setConnection(String value) {
+        set(CONNECTION, value);
+    }
+    public String getContentLength() {
+        return get(CONTENT_LENGTH);
+    }
+
+    public void setContentLength(String value) {
+        set(CONTENT_LENGTH, value);
+    }
+
+    //////////////////////////////
     @Override
     public String get(String key) {
         return mMap.get(key);
@@ -79,15 +107,13 @@ public class HttpHeader implements NameValueMap<String,String>{
 
     @Override
     public void set(String key, String Value) {
-        mMap.put(key,Value);
+        mMap.put(key, Value);
     }
 
     @Override
     public void setAll(Map<String, String> map) {
         mMap.putAll(map);
     }
-
-
 
 
     @Override
@@ -117,7 +143,7 @@ public class HttpHeader implements NameValueMap<String,String>{
 
     @Override
     public String put(String s, String s2) {
-        return mMap.put(s,s2);
+        return mMap.put(s, s2);
     }
 
     @Override
