@@ -97,11 +97,24 @@ public enum HttpStatus {
     Gateway_Timeout(504,"Gateway Timeout"),
     HTTP_Version_Not_Supported(505,"HTTP Version Not Supported");
 
-    private int mCode;
+    private int status;
     private String mMessage;
     private HttpStatus(int code,String message){
-        mCode = code;
+        status = code;
         mMessage = message;
     }
 
+    /**
+     * 返回状态码对用 message
+     * @param value  200
+     * @return   HttpStatus
+     */
+    public static HttpStatus getValue(int value){
+        for(HttpStatus httpStatus:values()){
+            if(value==httpStatus.status){
+                return httpStatus;
+            }
+        }
+        return null;
+    }
 }

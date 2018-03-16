@@ -6,6 +6,6 @@ package com.ihaveu.http;
  * Description:定义请求方法
  * http://tools.ietf.org/html/rfc7231
  */
-public enum HtttpMethod {
+public enum HttpMethod {
     GET,POST,TRACE,HEAD,DELETE,PUT,CONNECTION,OPTIONS
 }
