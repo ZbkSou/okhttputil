@@ -5,6 +5,7 @@ import com.ihaveu.http.HttpResponse;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -17,7 +18,8 @@ public abstract class BufferHttpRequest extends AbstractHttpRequest{
 
     private ByteArrayOutputStream mByteArray = new ByteArrayOutputStream();
 
-    protected OutputStream getBodyInternal(){
+
+    protected OutputStream getBodyOutputStream(){
         return mByteArray;
     }
 
@@ -28,5 +30,5 @@ public abstract class BufferHttpRequest extends AbstractHttpRequest{
         return executeInternal(header,data);
     }
 
-    protected abstract HttpResponse executeInternal(HttpHeader header, byte[] data);
+    protected abstract HttpResponse executeInternal(HttpHeader header, byte[] data) throws IOException;
 }

@@ -2,6 +2,7 @@ package com.ihaveu.http;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 
 /**
  * User: bkzhou
@@ -13,5 +14,7 @@ public interface HttpRequest {
     HttpHeader getHeaders();
     OutputStream getBody();
 
+    URI getUri();
+    HttpMethod getMethod();
     HttpResponse execute() throws IOException;
 }
