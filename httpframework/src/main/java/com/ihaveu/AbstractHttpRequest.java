@@ -41,7 +41,7 @@ public abstract class AbstractHttpRequest implements HttpRequest{
      * 执行网络请求
      * @return
      */
-    protected abstract HttpResponse executeInternal(HttpHeader header);
+    protected abstract HttpResponse executeInternal(HttpHeader header) throws IOException;
 
     @Override
     public OutputStream getBody() {

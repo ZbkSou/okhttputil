@@ -25,7 +25,7 @@ public abstract class BufferHttpRequest extends AbstractHttpRequest{
 
 
 
-    protected HttpResponse executeInternal(HttpHeader header) {
+    protected HttpResponse executeInternal(HttpHeader header) throws IOException {
         byte[] data  = mByteArray.toByteArray();
         return executeInternal(header,data);
     }
