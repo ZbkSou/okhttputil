@@ -71,7 +71,7 @@ public abstract class AbstractHttpResponse implements HttpResponse {
      *
      * @return
      */
-    protected abstract InputStream getBodyInternal();
+    protected abstract InputStream getBodyInternal() throws IOException;
 
     /**
      * 解压缩 Gzip
