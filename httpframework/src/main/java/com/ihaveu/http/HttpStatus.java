@@ -117,4 +117,16 @@ public enum HttpStatus {
         }
         return null;
     }
+
+    /**
+     * 判断是否请求成功
+     * @return
+     */
+    public boolean isSuccess(){
+        int value = status/100;
+        if(value==2){
+            return true;
+        }
+        return false;
+    }
 }

@@ -34,4 +34,10 @@ public interface HttpResponse extends Header,Cloneable{
      * @throws IOException
      */
     void close()throws IOException;
+
+    /**
+     * 获得长度
+     * @return
+     */
+    long getContentLength();
 }

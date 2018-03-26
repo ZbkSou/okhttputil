@@ -13,9 +13,14 @@ import com.ihaveu.iuzuan.filedownload.file.FileStorageManager;
 import com.ihaveu.iuzuan.filedownload.http.DownloadCallback;
 import com.ihaveu.iuzuan.filedownload.http.HttpManager;
 import com.ihaveu.iuzuan.filedownload.utils.Logger;
+import com.ihaveu.service.MoocHttpProvider;
+import com.ihaveu.service.MoocRequest;
+import com.ihaveu.service.MoocResponse;
 
 import java.io.File;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +33,23 @@ public class MainActivity extends AppCompatActivity {
         imageView= (ImageView) findViewById(R.id.imageView);
         File file = FileStorageManager.getInstance().getFileByName("http://www.imooc.com");
         Logger.debug("MainActivity", "file path = " + file.getAbsolutePath());
+
+        Map<String,String> map = new HashMap<>();
+        map.put("type","4");
+        map.put("pageSize","6");
+        map.put("pageNo","1");
+        MoocHttpProvider.helloWorld("http://t-87-card.zuanliantech.com:8080/card-service-web/activity/queryMsgRecordByType"
+            , map, new MoocResponse<String>() {
+                @Override
+                public void sucess(MoocRequest request, String data) {
+                    Logger.debug("MainActivity",data);
+                }
+
+                @Override
+                public void fail(int errorcode, String errorMsg) {
+
+                }
+            });
 
 //        HttpManager.getInstance().asyncRequest(
 //            "https://img01.sogoucdn.com/app/a/4001/2f6ed00d-753c-4c39-935e-1dd22d465f83.jpg"
@@ -60,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         Logger.debug("MainActivity",new Date().getTime()+"");
         final String url = "http://apk.gfan.com/index.php?c=api&m=down&src=wap&apk=50540";
 //        final String url = "http://i2.ihaveu.net/image/auction/picture/000/113/921/path/6b5f052f.png";
-        DownloadManager.getInstance().download(url, new DownloadCallback() {
+ /*       DownloadManager.getInstance().download(url, new DownloadCallback() {
             @Override
             public void success(File file) {
                 if(count<1){
@@ -89,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 Logger.debug("MainActivity","progress  :"+progress);
             }
         });
+        */
 
     }
     private void installApk(File file){

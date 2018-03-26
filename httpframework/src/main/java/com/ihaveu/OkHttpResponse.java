@@ -1,11 +1,14 @@
 package com.ihaveu;
 
+import android.util.Log;
+
 import com.ihaveu.http.HttpHeader;
 import com.ihaveu.http.HttpStatus;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Logger;
 
 /**
  * User: bkzhou
@@ -45,6 +48,12 @@ public class OkHttpResponse extends AbstractHttpResponse {
     @Override
     public String getStatusMsg() {
         return mResponse.message();
+    }
+
+    @Override
+    public long getContentLength() {
+        Log.d("getContentLength",mResponse.body().contentLength()+"");
+        return mResponse.body().contentLength();
     }
 
     @Override

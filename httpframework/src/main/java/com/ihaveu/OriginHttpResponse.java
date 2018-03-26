@@ -43,6 +43,10 @@ public class OriginHttpResponse extends AbstractHttpResponse{
         return null;
     }
 
+    @Override
+    public long getContentLength() {
+        return mConnection.getContentLength();
+    }
 
 
     @Override
