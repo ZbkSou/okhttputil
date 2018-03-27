@@ -22,7 +22,7 @@ public class WarpperResponse extends MoocResponse<String>{
     @Override
     void sucess(MoocRequest request, String data) {
 
-        moocResponse.sucess(request,);
+        moocResponse.sucess(request,data);
     }
 
     @Override

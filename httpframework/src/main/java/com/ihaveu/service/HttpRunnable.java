@@ -26,6 +26,9 @@ public class HttpRunnable implements  Runnable{
         try {
             mHttpRequest.getBody().write(moocRequest.getData());
             HttpResponse response = mHttpRequest.execute();
+            String contentType = response.getHeaders().getContentType();
+            moocRequest.setContentType(contentType);
+
             if(response.getStatus().isSuccess()){
                 if(moocRequest.getResponse()!=null){
                     moocRequest.getResponse().sucess(moocRequest,new String(getData(response)));

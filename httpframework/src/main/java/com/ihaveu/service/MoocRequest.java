@@ -17,6 +17,11 @@ public class MoocRequest  {
 
     private MoocResponse mResponse;
 
+
+
+    private String mContentType;
+
+
     public String getUrl() {
         return mUrl;
     }
@@ -47,6 +52,14 @@ public class MoocRequest  {
 
     public void setResponse(MoocResponse mResponse) {
         this.mResponse = mResponse;
+    }
+
+    public String getContentType() {
+        return mContentType;
+    }
+
+    public void setContentType(String mContentType) {
+        this.mContentType = mContentType;
     }
 
 }
