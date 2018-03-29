@@ -12,4 +12,8 @@ import java.lang.reflect.Type;
  */
 public interface Convert {
     Object pares(HttpResponse response, Type type) throws  IOException;
+
+    Object pares(String content,Type type)throws  IOException;
+
+    boolean isCanParse(String contentType);
 }

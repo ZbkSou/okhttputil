@@ -18,6 +18,7 @@ import com.ihaveu.service.MoocRequest;
 import com.ihaveu.service.MoocResponse;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,10 +40,12 @@ public class MainActivity extends AppCompatActivity {
         map.put("pageSize","6");
         map.put("pageNo","1");
         MoocHttpProvider.helloWorld("http://t-87-card.zuanliantech.com:8080/card-service-web/activity/queryMsgRecordByType"
-            , map, new MoocResponse<String>() {
+            , map, new MoocResponse<ResponseBean>() {
+
                 @Override
-                public void sucess(MoocRequest request, String data) {
-                    Logger.debug("MainActivity",data);
+                public void sucess(MoocRequest request, ResponseBean data) throws IOException {
+
+                    Logger.debug("nate",data.toString());
                 }
 
                 @Override

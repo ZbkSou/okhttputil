@@ -1,9 +1,13 @@
 package com.ihaveu.service;
 
 import com.ihaveu.http.HttpMethod;
+import com.ihaveu.service.convert.Convert;
+import com.ihaveu.service.convert.JsonConvert;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,6 +20,13 @@ public class MoocHttpProvider {
     private static final String ENCODING = "utf-8";
 
     private static WorkStation workStation = new WorkStation();
+
+    private static final List<Convert> sConverts = new ArrayList<>();
+
+    static {
+        sConverts.add(new JsonConvert());
+    }
+
     /**
      * 请求数据编码
      * @param value
@@ -44,12 +55,15 @@ public class MoocHttpProvider {
         return buffer.toString().getBytes();
     }
 
-    public static void helloWorld(String url, Map<String, String> value, MoocResponse<String> response) {
+    public static void helloWorld(String url, Map<String, String> value, MoocResponse response) {
         MoocRequest request = new MoocRequest();
+
+        WarpperResponse warpperResponse = new WarpperResponse(response,sConverts);
+
         request.setUrl(url);
         request.setMethod(HttpMethod.POST);
         request.setData(encodeParam(value));
-        request.setResponse(response);
+        request.setResponse(warpperResponse);
         workStation.add(request);
     }
 }
